@@ -54,11 +54,12 @@ st.sidebar.write('**☘️ Members of Group 7 Business IT 2 :**')
 for member in members_info:
     st.sidebar.write(member['name'])
 
+# Initialize tabs
+tabs = st.tabs(["Top Countries Bar Chart", "Age Distribution Over Time", "Geographic Distribution", "Height and Weight Scatter Plot"])
 
-
-### TAB 1: BAR CHART
-with tab1:
-    # Calculate the value counts of Birth_Country
+### TAB 1: TOP COUNTRIES BAR CHART
+with tabs[0]:
+    # Calculate the value counts of Team
     df = data['Team'].value_counts()
 
     # Set the initial value for the slider
@@ -96,7 +97,7 @@ with tab1:
     st.altair_chart(bars, use_container_width=True)
 
 ### TAB 2: AGE DISTRIBUTION OVER TIME
-with tab2:
+with tabs[1]:
     # Filter data to remove rows with missing 'Age' or 'Year'
     data_filtered = data.dropna(subset=['Age', 'Year'])
 
@@ -115,38 +116,40 @@ with tab2:
     st.plotly_chart(fig, use_container_width=True)
 
 ### TAB 3: GEOGRAPHIC DISTRIBUTION
-# Calculate the count of athletes by birth country
-athlete_counts = data['NOC'].value_counts().reset_index()
-athlete_counts.columns = ['NOC', 'Count']
+with tabs[2]:
+    # Calculate the count of athletes by birth country
+    athlete_counts = data['NOC'].value_counts().reset_index()
+    athlete_counts.columns = ['NOC', 'Count']
 
-# Add the title of the plot
-tab3.subheader("Geographic Distribution of Olympic Athletes' Birth Countries")
+    # Add the title of the plot
+    st.subheader("Geographic Distribution of Olympic Athletes' Birth Countries")
 
-# Create the map visualization
-fig_map = px.scatter_geo(
-    athlete_counts,
-    locations="NOC",
-    color="Count",
-    hover_name="NOC",
-    size="Count",
-    projection="natural earth",
-    title="Olympic Athletes' Birth Countries",
-)
+    # Create the map visualization
+    fig_map = px.scatter_geo(
+        athlete_counts,
+        locations="NOC",
+        color="Count",
+        hover_name="NOC",
+        size="Count",
+        projection="natural earth",
+        title="Olympic Athletes' Birth Countries",
+    )
 
-# Display the map
-tab3.plotly_chart(fig_map, use_container_width=True)
+    # Display the map
+    st.plotly_chart(fig_map, use_container_width=True)
+
 ### TAB 4: HEIGHT AND WEIGHT SCATTER PLOT
-with tab4:
+with tabs[3]:
     st.subheader("Height and Weight of Olympic Athletes")
 
     # Filter data to remove rows with missing 'Height' or 'Weight'
-    data = data.dropna(subset=['Height', 'Weight'])
+    data_filtered = data.dropna(subset=['Height', 'Weight'])
 
     # Add a slider to filter data by year
-    year_slider = st.slider("Year Range", int(data['Year'].min()), int(data['Year'].max()), (1950, 2020))
+    year_slider = st.slider("Year Range", int(data_filtered['Year'].min()), int(data_filtered['Year'].max()), (1950, 2020))
 
     # Filter data by selected year range
-    filtered_data = data[(data['Year'] >= year_slider[0]) & (data['Year'] <= year_slider[1])]
+    filtered_data = data_filtered[(data_filtered['Year'] >= year_slider[0]) & (data_filtered['Year'] <= year_slider[1])]
 
     # Create the scatter plot with Plotly
     fig = px.scatter(filtered_data, 
