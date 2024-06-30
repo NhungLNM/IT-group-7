@@ -1,11 +1,12 @@
-import pandas as pd
 import streamlit as st
+import pandas as pd
 import altair as alt
 import plotly.express as px
+
 # Read the data from Excel
 data = pd.read_excel('Athlete_events.xlsx')
 
-# Verify column names to ensure we use the correct one
+# Verify column names to ensure we use the correct ones
 print(data.columns)
 
 # Group members information
@@ -46,7 +47,7 @@ st.write("""
         - *Weight*: Weight of the athlete
         """)
 
-st.divider()
+st.markdown('---')
 st.header("Top Birth Countries, Age Distribution, and Geographic Distribution Chart")
 st.write("Discover these three graphs below with us")
 
@@ -98,7 +99,6 @@ with tab1:
     # Display the chart using Streamlit
     st.altair_chart(bars, use_container_width=True)
 
-
 ### TAB 3: GEOGRAPHIC DISTRIBUTION
 # Calculate the count of athletes by birth country
 athlete_counts = data['NOC'].value_counts().reset_index()
@@ -120,18 +120,19 @@ fig_map = px.scatter_geo(
 
 # Display the map
 tab3.plotly_chart(fig_map, use_container_width=True)
+
 ### TAB 4: HEIGHT AND WEIGHT SCATTER PLOT
 with tab4:
     st.subheader("Height and Weight of Olympic Athletes")
 
     # Filter data to remove rows with missing 'Height' or 'Weight'
-    data = data.dropna(subset=['Height', 'Weight'])
+    filtered_data = data.dropna(subset=['Height', 'Weight'])
 
     # Add a slider to filter data by year
-    year_slider = st.slider("Year Range", int(data['Year'].min()), int(data['Year'].max()), (1950, 2020))
+    year_slider = st.slider("Year Range", int(filtered_data['Year'].min()), int(filtered_data['Year'].max()), (1950, 2020))
 
     # Filter data by selected year range
-    filtered_data = data[(data['Year'] >= year_slider[0]) & (data['Year'] <= year_slider[1])]
+    filtered_data = filtered_data[(filtered_data['Year'] >= year_slider[0]) & (filtered_data['Year'] <= year_slider[1])]
 
     # Create the scatter plot with Plotly
     fig = px.scatter(filtered_data, 
