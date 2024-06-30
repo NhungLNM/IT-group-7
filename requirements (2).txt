@@ -12,3 +12,4 @@ streamlit_lottie
 streamlit_extras
 requests
 Pillow
+altair
