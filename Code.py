@@ -1,17 +1,6 @@
 import pandas as pd
 import streamlit as st
-
-# Ensure plotly is installed
-try:
-    import plotly.express as px
-    print("Plotly is installed and can be imported successfully.")
-except ImportError:
-    print("Plotly is not installed. Installing now...")
-    import os
-    os.system('pip install plotly')
-    import plotly.express as px
-    print("Plotly installed and imported successfully.")
-
+import plotly.express as px
 import altair as alt
 
 # Read the data from Excel
@@ -58,7 +47,7 @@ st.write("""
         - *Weight*: Weight of the athlete
         """)
 
-st.divider()
+st.markdown('---')
 st.header("Top Birth Countries, Age Distribution, and Geographic Distribution Chart")
 st.write("Discover these three graphs below with us")
 
@@ -93,7 +82,7 @@ with tab1:
     color1 = color1[:len(df1)]
 
     # Update the title of the plot
-    st.subheader("Top {} Countries That Had The Most Olympic Athletes".format(value))
+    st.subheader(f"Top {value} Countries That Had The Most Olympic Athletes")
 
     # Create the bar chart using Altair
     bar_data = pd.DataFrame({"Country": df1.index, "Number of Athletes": df1.values, "Color": color1})
@@ -110,28 +99,29 @@ with tab1:
     # Display the chart using Streamlit
     st.altair_chart(bars, use_container_width=True)
 
-
 ### TAB 3: GEOGRAPHIC DISTRIBUTION
-# Calculate the count of athletes by birth country
-athlete_counts = data['NOC'].value_counts().reset_index()
-athlete_counts.columns = ['NOC', 'Count']
+with tab3:
+    # Calculate the count of athletes by birth country
+    athlete_counts = data['NOC'].value_counts().reset_index()
+    athlete_counts.columns = ['NOC', 'Count']
 
-# Add the title of the plot
-tab3.subheader("Geographic Distribution of Olympic Athletes' Birth Countries")
+    # Add the title of the plot
+    st.subheader("Geographic Distribution of Olympic Athletes' Birth Countries")
 
-# Create the map visualization
-fig_map = px.scatter_geo(
-    athlete_counts,
-    locations="NOC",
-    color="Count",
-    hover_name="NOC",
-    size="Count",
-    projection="natural earth",
-    title="Olympic Athletes' Birth Countries",
-)
+    # Create the map visualization
+    fig_map = px.scatter_geo(
+        athlete_counts,
+        locations="NOC",
+        color="Count",
+        hover_name="NOC",
+        size="Count",
+        projection="natural earth",
+        title="Olympic Athletes' Birth Countries",
+    )
 
-# Display the map
-tab3.plotly_chart(fig_map, use_container_width=True)
+    # Display the map
+    st.plotly_chart(fig_map, use_container_width=True)
+
 ### TAB 4: HEIGHT AND WEIGHT SCATTER PLOT
 with tab4:
     st.subheader("Height and Weight of Olympic Athletes")
