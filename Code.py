@@ -18,7 +18,7 @@ members_info = [
 st.set_page_config(page_title="PYTHON 2 - BUSINESS IT 2", page_icon="🥰", layout="wide")
 
 # HEADER SECTION
-st.subheader("Hi ❤️ we're from group 7 class afternoon Business IT2")
+st.subheader("Hi everyone ❤️ we're from group 7 class afternoon Business IT2")
 st.title("What is there more to know about Olympic Athletes?")
 st.write("Apart from their achievements, join us today on this app to get to know the athletes' Birth Countries and Average Age of Participation!")
 
@@ -45,8 +45,7 @@ st.write("""
         """)
 
 st.divider()
-st.header("Top Birth Countries, Age Distribution, and Geographic Distribution Chart")
-st.write("Discover these three graphs below with us")
+st.write("Discover these four graphs below with us")
 
 # Add Sidebar
 st.sidebar.write('**🎯 Reporting to Dr. Tan Duc Do**')
@@ -54,115 +53,108 @@ st.sidebar.write('**☘️ Members of Group 7 Business IT 2 :**')
 for member in members_info:
     st.sidebar.write(member['name'])
 
-# Initialize tabs
-tabs = st.beta_expander("Explore different visualizations")
-with tabs:
-    tab1 = st.expander("Top Countries Bar Chart")
-    tab2 = st.expander("Age Distribution Over Time")
-    tab3 = st.expander("Geographic Distribution")
-    tab4 = st.expander("Height and Weight Scatter Plot")
+# Create tabs for different visualizations
+tabs = st.tabs(["Top Countries Bar Chart", "Age Distribution Boxplot", "Geographic Distribution", "Height and Weight Scatter Plot"])
 
-    ### TAB 1: TOP COUNTRIES BAR CHART
-    with tab1:
-        # Calculate the value counts of Team
-        df = data['Team'].value_counts()
+### TAB 1: BAR CHART
+with tabs[0]:
+    # Calculate the value counts of Birth_Country
+    df = data['Team'].value_counts()
 
-        # Set the initial value for the slider
-        value = 5
+    # Set the initial value for the slider
+    value = 5
 
-        # Get the top N countries with the most participating athletes
-        df1 = df.nlargest(n=value, keep='all')
+    # Get the top N countries with the most participating athletes
+    df1 = df.nlargest(n=value, keep='all')
 
-        # Define color palette for the bars
-        color1 = ["#19376D", "#576CBC", "#A5D7E8", "#66347F", "#9E4784", "#D27685", "#D4ADFC", "#F2F7A1", "#FB2576", "#E94560"]
+    # Define color palette for the bars
+    color1 = ["#19376D", "#576CBC", "#A5D7E8", "#66347F", "#9E4784", "#D27685", "#D4ADFC", "#F2F7A1", "#FB2576", "#E94560"]
 
-        # Add the slider
-        value = st.slider("Number of Countries", min_value=1, max_value=10, step=1, value=value)
+    # Add the slider
+    value = st.slider("Number of Countries", min_value=1, max_value=10, step=1, value=value)
 
-        # Update the top N countries based on the slider value
-        df1 = df.nlargest(n=value, keep='all')
-        color1 = color1[:len(df1)]
+    # Update the top N countries based on the slider value
+    df1 = df.nlargest(n=value, keep='all')
+    color1 = color1[:len(df1)]
 
-        # Update the title of the plot
-        st.subheader("Top {} Countries That Had The Most Olympic Athletes".format(value))
+    # Update the title of the plot
+    st.subheader("Top {} Countries That Had The Most Olympic Athletes".format(value))
 
-        # Create the bar chart using Altair
-        bar_data = pd.DataFrame({"Country": df1.index, "Number of Athletes": df1.values, "Color": color1})
-        bars = alt.Chart(bar_data).mark_bar().encode(
-            x=alt.X('Country', sort=None),
-            y=alt.Y('Number of Athletes'),
-            color=alt.Color('Color', scale=None),
-            tooltip=['Country', 'Number of Athletes']
-        ).properties(width=1400)
+    # Create the bar chart using Altair
+    bar_data = pd.DataFrame({"Country": df1.index, "Number of Athletes": df1.values, "Color": color1})
+    bars = alt.Chart(bar_data).mark_bar().encode(
+        x=alt.X('Country', sort=None),
+        y=alt.Y('Number of Athletes'),
+        color=alt.Color('Color', scale=None),
+        tooltip=['Country', 'Number of Athletes']
+    ).properties(width=1400)
 
-        # Rotate x-axis labels for better readability
-        bars = bars.configure_axisX(labelAngle=0)
+    # Rotate x-axis labels for better readability
+    bars = bars.configure_axisX(labelAngle=0)
 
-        # Display the chart using Streamlit
-        st.altair_chart(bars, use_container_width=True)
+    # Display the chart using Streamlit
+    st.altair_chart(bars, use_container_width=True)
 
-    ### TAB 2: AGE DISTRIBUTION OVER TIME
-    with tab2:
-        # Filter data to remove rows with missing 'Age' or 'Year'
-        data_filtered = data.dropna(subset=['Age', 'Year'])
+### TAB 2: AGE DISTRIBUTION OVER TIME
+with tabs[1]:
+    # Filter data to remove rows with missing 'Age' or 'Year'
+    data_filtered = data.dropna(subset=['Age', 'Year'])
 
-        # Calculate average age per year
-        avg_age_year = data_filtered.groupby('Year')['Age'].mean().reset_index()
+    # Calculate average age per year
+    avg_age_year = data_filtered.groupby('Year')['Age'].mean().reset_index()
 
-        # Plot the line chart
-        st.subheader("Average Age of Olympic Athletes Over Time")
-        st.write("Explore how the average age of Olympic athletes has changed over the years.")
+    # Plot the line chart
+    st.subheader("Average Age of Olympic Athletes Over Time")
+    st.write("Explore how the average age of Olympic athletes has changed over the years.")
 
-        # Create the line chart using Plotly
-        fig = px.line(avg_age_year, x='Year', y='Age', title='Average Age of Olympic Athletes Over Time')
+    # Create the line chart using Plotly
+    fig = px.line(avg_age_year, x='Year', y='Age', title='Average Age of Olympic Athletes Over Time')
 
-        # Customize layout and display the plot
-        fig.update_traces(mode='lines+markers')
-        st.plotly_chart(fig, use_container_width=True)
+    # Customize layout and display the plot
+    fig.update_traces(mode='lines+markers')
+    st.plotly_chart(fig, use_container_width=True)
 
-    ### TAB 3: GEOGRAPHIC DISTRIBUTION
-    with tab3:
-        # Calculate the count of athletes by birth country
-        athlete_counts = data['NOC'].value_counts().reset_index()
-        athlete_counts.columns = ['NOC', 'Count']
+### TAB 3: GEOGRAPHIC DISTRIBUTION
+with tabs[2]:
+    # Calculate the count of athletes by birth country
+    athlete_counts = data['NOC'].value_counts().reset_index()
+    athlete_counts.columns = ['NOC', 'Count']
 
-        # Add the title of the plot
-        st.subheader("Geographic Distribution of Olympic Athletes' Birth Countries")
+    # Add the title of the plot
+    st.subheader("Geographic Distribution of Olympic Athletes' Birth Countries")
 
-        # Create the map visualization
-        fig_map = px.scatter_geo(
-            athlete_counts,
-            locations="NOC",
-            color="Count",
-            hover_name="NOC",
-            size="Count",
-            projection="natural earth",
-            title="Olympic Athletes' Birth Countries",
-        )
+    # Create the map visualization
+    fig_map = px.scatter_geo(
+        athlete_counts,
+        locations="NOC",
+        color="Count",
+        hover_name="NOC",
+        size="Count",
+        projection="natural earth",
+        title="Olympic Athletes' Birth Countries",
+    )
 
-        # Display the map
-        st.plotly_chart(fig_map, use_container_width=True)
+    # Display the map
+    st.plotly_chart(fig_map, use_container_width=True)
 
-    ### TAB 4: HEIGHT AND WEIGHT SCATTER PLOT
-    with tab4:
-        st.subheader("Height and Weight of Olympic Athletes")
+### TAB 4: HEIGHT AND WEIGHT SCATTER PLOT
+with tabs[3]:
+    # Filter data to remove rows with missing 'Height' or 'Weight'
+    data_filtered = data.dropna(subset=['Height', 'Weight'])
 
-        # Filter data to remove rows with missing 'Height' or 'Weight'
-        data_filtered = data.dropna(subset=['Height', 'Weight'])
+    # Add a slider to filter data by year
+    year_slider = st.slider("Year Range", int(data['Year'].min()), int(data['Year'].max()), (1950, 2020))
 
-        # Add a slider to filter data by year
-        year_slider = st.slider("Year Range", int(data_filtered['Year'].min()), int(data_filtered['Year'].max()), (1950, 2020))
+    # Filter data by selected year range
+    filtered_data = data_filtered[(data_filtered['Year'] >= year_slider[0]) & (data_filtered['Year'] <= year_slider[1])]
 
-        # Filter data by selected year range
-        filtered_data = data_filtered[(data_filtered['Year'] >= year_slider[0]) & (data_filtered['Year'] <= year_slider[1])]
+    # Create the scatter plot with Plotly
+    fig = px.scatter(filtered_data,
+                     x="Height",
+                     y="Weight",
+                     color="Sex",
+                     hover_data=["Name", "Sport", "Year"],
+                     title="Height and Weight of Olympic Athletes")
 
-        # Create the scatter plot with Plotly
-        fig = px.scatter(filtered_data, 
-                         x="Height", 
-                         y="Weight", 
-                         color="Sex", 
-                         hover_data=["Name", "Sport", "Year"],
-                         title="Height and Weight of Olympic Athletes")
-
-        fig.update_layout(title_x=0.5)
-        st.plotly_chart(fig, use_container_width=True)
+    fig.update_layout(title_x=0.5)
+    st.plotly_chart(fig, use_container_width=True)
